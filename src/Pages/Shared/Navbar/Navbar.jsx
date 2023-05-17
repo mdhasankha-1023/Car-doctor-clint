@@ -1,8 +1,24 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import logo from '../../../assets/icons/logo.svg'
+import ActiveRoutes from '../../../Routes/ActiveRoutes/ActiveRoutes';
+import { AuthContext } from '../../../AuthProvider/AuthProvider';
+import { FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
+    const { user, logOut, errorNotify } = useContext(AuthContext);
+    // console.log(user.photoURL)
+
+
+    // handle logOut button
+    const handleLogOutBtn = () => {
+        logOut()
+            .then(() => { })
+            .catch(error => {
+                errorNotify(error.message)
+            })
+    }
+
     return (
         <div className="navbar bg-base-100">
             <div className="navbar-start">
@@ -27,17 +43,41 @@ const Navbar = () => {
             </div>
             <div className="navbar-center hidden lg:flex">
                 <ul className="menu menu-horizontal px-1">
-                    <li><Link to='/'>Home</Link></li>
+                    <li><ActiveRoutes to='/'>Home</ActiveRoutes></li>
                     <li tabIndex={0}>
                         <Link to='/about'>About</Link>
                     </li>
-                    <li><Link to='/services'>Services</Link></li>
+                    <li><Link to='/orders'>Orders</Link></li>
                     <li><Link to='/blog'>Blog</Link></li>
                     <li><Link to='/contact'>Contact</Link></li>
                 </ul>
             </div>
             <div className="navbar-end">
-            <button className="btn btn-outline text-[#FF3811]">Appoinment</button>
+                {
+                    user ? <>
+                        {
+                            user.photoURL !== null ?
+                                <div className="avatar me-4">
+                                    <div className="rounded-full w-8">
+                                        <img src={user.photoURL} />
+                                    </div>
+                                </div>
+                                :
+                                <div className="avatar placeholder me-4">
+                                    <div className="bg-neutral-focus text-neutral-content rounded-full w-8">
+                                        <FaUser></FaUser>
+                                    </div>
+                                </div>
+                        }
+
+
+                        <button onClick={handleLogOutBtn} className="btn btn-sm">Log-out</button>
+                    </>
+                        :
+                        <Link to='/sign-in'>
+                            <button className="btn btn-sm">sign-in</button>
+                        </Link>
+                }
             </div>
         </div>
     );
